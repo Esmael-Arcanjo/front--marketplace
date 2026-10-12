@@ -9,14 +9,48 @@ export default function Home() {
   const [active, setActive] = useState("");
 
   useEffect(() => {
-    api.get("/shop/products?limit=60").then((r) => setProducts(r.data)).catch(() => {});
-    api.get("/shop/categories").then((r) => setCats(r.data)).catch(() => {});
+    // Trata e garante que o resultado seja sempre um Array puro
+    api
+      .get("/shop/products?limit=60")
+      .then((r) => {
+        const data = r.data;
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else if (Array.isArray(data?.products)) {
+          setProducts(data.products);
+        } else if (Array.isArray(data?.data)) {
+          setProducts(data.data);
+        } else {
+          setProducts([]);
+        }
+      })
+      .catch(() => setProducts([]));
+
+    api
+      .get("/shop/categories")
+      .then((r) => {
+        const data = r.data;
+        if (Array.isArray(data)) {
+          setCats(data);
+        } else if (Array.isArray(data?.categories)) {
+          setCats(data.categories);
+        } else if (Array.isArray(data?.data)) {
+          setCats(data.data);
+        } else {
+          setCats([]);
+        }
+      })
+      .catch(() => setCats([]));
   }, []);
 
-  const visible = useMemo(
-    () => (active ? products.filter((p) => p.category === active) : products),
-    [products, active],
-  );
+  const visible = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+    return active ? products.filter((p) => p.category === active) : products;
+  }, [products, active]);
+
+  const categoriesList = useMemo(() => {
+    return Array.isArray(cats) ? cats : [];
+  }, [cats]);
 
   return (
     <div>
@@ -47,7 +81,7 @@ export default function Home() {
         </div>
       </section>
 
-      {cats.length > 0 && (
+      {categoriesList.length > 0 && (
         <section className="sticky top-16 z-20 border-b border-black/5 bg-white/85 backdrop-blur">
           <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-6 py-4" data-testid="home-categories">
             <button onClick={() => setActive("")}
@@ -57,7 +91,7 @@ export default function Home() {
                     }`}>
               Tudo
             </button>
-            {cats.map((c) => (
+            {categoriesList.map((c) => (
               <button key={c} onClick={() => setActive(c)}
                       data-testid={`cat-${c}`}
                       className={`rounded-full border px-4 py-1.5 text-sm font-medium whitespace-nowrap ${
@@ -91,25 +125,25 @@ export default function Home() {
 }
 
 export function ProductCard({ p }) {
-  const img = (p.images && p.images[0]) || p.image_url;
+  const img = (p?.images && p.images[0]) || p?.image_url;
   return (
-    <Link to={`/product/${p.id}`} data-testid={`product-card-${p.id}`}
+    <Link to={`/product/${p?.id}`} data-testid={`product-card-${p?.id}`}
           className="group flex flex-col overflow-hidden rounded-2xl border border-black/5 bg-white transition hover:shadow-lg hover:-translate-y-0.5">
       <div className="relative aspect-square overflow-hidden bg-brand-50">
         {img
-          ? <img src={img} alt={p.name} className="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+          ? <img src={img} alt={p?.name} className="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
           : <div className="grid h-full place-items-center text-4xl text-brand-500 font-display">Wibaza</div>}
-        {p.category && (
+        {p?.category && (
           <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-ink-700 shadow-sm">
             {p.category}
           </span>
         )}
       </div>
       <div className="flex flex-1 flex-col p-4">
-        <p className="line-clamp-2 text-sm font-medium">{p.name}</p>
-        <p className="mt-1 text-xs text-ink-500">por {p.seller_name}</p>
+        <p className="line-clamp-2 text-sm font-medium">{p?.name}</p>
+        <p className="mt-1 text-xs text-ink-500">por {p?.seller_name}</p>
         <p className="mt-auto pt-3 font-display text-lg font-extrabold text-brand-600">
-          {money(p.price_cents, p.currency)}
+          {money(p?.price_cents, p?.currency)}
         </p>
       </div>
     </Link>
