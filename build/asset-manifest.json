@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/wibaza/static/css/main.98f1c7b8.css",
+    "main.js": "/wibaza/static/js/main.93078373.js",
+    "index.html": "/wibaza/index.html",
+    "main.98f1c7b8.css.map": "/wibaza/static/css/main.98f1c7b8.css.map",
+    "main.93078373.js.map": "/wibaza/static/js/main.93078373.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.98f1c7b8.css",
+    "static/js/main.93078373.js"
+  ]
+}
