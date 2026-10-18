@@ -9,6 +9,6 @@ yarn start
 ```
 
 git add .
-git commit -m "FEITO"
+git commit -m "Atualizado"
 git push origin main
 
